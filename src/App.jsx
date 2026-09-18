@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Header from './components/Header.jsx';
 import Footer from './components/Footer.jsx';
@@ -5,6 +6,25 @@ import HomePage from './pages/HomePage.jsx';
 import WordPage from './pages/WordPage.jsx';
 import { useVocab } from './context/VocabContext.jsx';
 import { useLang } from './context/LangContext.jsx';
+
+function ScrollToTop() {
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const onScroll = () => setVisible(window.scrollY > 300);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
+  return (
+    <button
+      className={`scroll-top${visible ? ' visible' : ''}`}
+      onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+      aria-label="Lên đầu trang"
+      title="Lên đầu trang"
+    >
+      ↑
+    </button>
+  );
+}
 
 export default function App() {
   const { words, error } = useVocab();
@@ -26,6 +46,7 @@ export default function App() {
         )}
       </main>
       <Footer />
+      <ScrollToTop />
     </div>
   );
 }

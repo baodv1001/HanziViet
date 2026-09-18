@@ -20,11 +20,11 @@ function writerColors(theme) {
     };
   }
   return {
-    strokeColor: '#111111',
+    strokeColor: '#ff0000',
     outlineColor: '#c8c8cc',
-    radicalColor: '#e11d48',
-    drawingColor: '#2563eb',
-    highlightColor: '#e11d48',
+    radicalColor: '#ff0000',
+    drawingColor: '#ff0000',
+    highlightColor: '#ff0000',
   };
 }
 
