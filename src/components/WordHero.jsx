@@ -83,9 +83,17 @@ export default function WordHero({ word, strokeCount }) {
             ))}
           </span>
         </div>
-        <button className="btn btn--ghost" onClick={share}>
-          {copied ? `✓ ${t.copied}` : `⤴ ${t.share}`}
-        </button>
+        <div className="hero__actions">
+          <button
+            className="btn btn--stroke-jump"
+            onClick={() => document.getElementById('strokes')?.scrollIntoView({ behavior: 'smooth' })}
+          >
+            ✍ {lang === 'vi' ? 'Cách viết' : 'Stroke order'}
+          </button>
+          <button className="btn btn--ghost" onClick={share}>
+            {copied ? `✓ ${t.copied}` : `⤴ ${t.share}`}
+          </button>
+        </div>
       </div>
     </section>
   );

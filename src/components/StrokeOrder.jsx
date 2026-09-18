@@ -131,7 +131,7 @@ export default function StrokeOrder({ chars }) {
   const restart = () => setRestartKey((k) => k + 1);
 
   return (
-    <section className="panel strokes">
+    <section id="strokes" className="panel strokes">
       <div className="panel__head">
         <h2 className="panel__title">Thứ tự viết nét chữ</h2>
         <div className="tabs">

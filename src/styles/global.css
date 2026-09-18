@@ -608,6 +608,21 @@ main.container {
   flex-wrap: wrap;
   gap: 8px;
 }
+.hero__actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.btn--stroke-jump {
+  background: var(--red);
+  color: #fff;
+  border-color: var(--red);
+  font-weight: 600;
+}
+.btn--stroke-jump:hover {
+  opacity: 0.88;
+  border-color: var(--red);
+}
 .tone {
   display: inline-block;
   margin-left: 4px;
