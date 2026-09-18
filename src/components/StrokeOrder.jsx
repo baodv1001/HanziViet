@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import HanziWriter from 'hanzi-writer';
 import { charDataLoader } from '../lib/strokes.js';
+import { useTheme } from '../context/ThemeContext.jsx';
 
 const SPEEDS = [
   { label: 'Chậm', value: 0.5 },
@@ -8,22 +9,39 @@ const SPEEDS = [
   { label: 'Nhanh', value: 2 },
 ];
 
-/**
- * Thứ tự viết nét chữ – TỰ ĐỘNG chạy khi mở trang, viết lần lượt từng chữ rồi lặp lại.
- * Chế độ "Luyện tập": người dùng tự viết bằng chuột/ngón tay, có gợi ý khi sai.
- */
+function writerColors(theme) {
+  if (theme === 'dark') {
+    return {
+      strokeColor: '#f5f5f4',
+      outlineColor: '#3f3f46',
+      radicalColor: '#f97316',
+      drawingColor: '#38bdf8',
+      highlightColor: '#38bdf8',
+    };
+  }
+  return {
+    strokeColor: '#111111',
+    outlineColor: '#c8c8cc',
+    radicalColor: '#e11d48',
+    drawingColor: '#2563eb',
+    highlightColor: '#e11d48',
+  };
+}
+
 export default function StrokeOrder({ chars }) {
-  const [mode, setMode] = useState('watch'); // 'watch' | 'practice'
+  const { theme } = useTheme();
+  const [mode, setMode] = useState('watch');
   const [speed, setSpeed] = useState(1);
   const [showOutline, setShowOutline] = useState(true);
-  const [current, setCurrent] = useState(0);
+  const [animating, setAnimating] = useState(false);
   const [restartKey, setRestartKey] = useState(0);
 
   const boxRefs = useRef([]);
   const writersRef = useRef([]);
   const stopRef = useRef(false);
 
-  // Khởi tạo writer cho từng chữ
+  const colors = writerColors(theme);
+
   useEffect(() => {
     writersRef.current = chars.map((ch, i) => {
       const el = boxRefs.current[i];
@@ -37,11 +55,7 @@ export default function StrokeOrder({ chars }) {
         strokeAnimationSpeed: speed,
         delayBetweenStrokes: 350 / speed,
         delayBetweenLoops: 1200,
-        strokeColor: '#f5f5f4',
-        radicalColor: '#f97316',
-        outlineColor: '#3f3f46',
-        drawingColor: '#38bdf8',
-        highlightColor: '#38bdf8',
+        ...colors,
         drawingWidth: 8,
         charDataLoader,
         renderer: 'svg',
@@ -50,59 +64,49 @@ export default function StrokeOrder({ chars }) {
     return () => {
       stopRef.current = true;
       writersRef.current.forEach((w) => {
-        try {
-          w.cancelQuiz();
-          w.hideCharacter({ duration: 0 });
-        } catch {
-          /* bỏ qua */
-        }
+        try { w.cancelQuiz(); w.hideCharacter({ duration: 0 }); } catch { /* ignore */ }
       });
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [chars, speed, showOutline]);
+  }, [chars, speed, showOutline, theme]);
 
-  // Chế độ xem: tự động viết lần lượt từng chữ, xong quay lại từ đầu (không cần bấm gì)
+  // Watch mode: all characters animate simultaneously, then loop
   useEffect(() => {
     if (mode !== 'watch') return;
     stopRef.current = false;
     const writers = writersRef.current;
     let cancelled = false;
 
-    const animateFrom = async (idx) => {
-      for (let i = 0; i < writers.length; i++) writers[i].hideCharacter({ duration: 0 });
-      let i = idx;
+    const run = async () => {
+      writers.forEach((w) => w.hideCharacter({ duration: 0 }));
       while (!cancelled && !stopRef.current) {
-        setCurrent(i);
-        await new Promise((resolve) => {
-          const w = writers[i];
-          w.hideCharacter({ duration: 0 });
-          w.animateCharacter({ onComplete: resolve });
-        });
+        setAnimating(true);
+        await Promise.all(
+          writers.map(
+            (w) =>
+              new Promise((resolve) => {
+                w.hideCharacter({ duration: 0 });
+                w.animateCharacter({ onComplete: resolve });
+              }),
+          ),
+        );
         if (cancelled) return;
-        await new Promise((r) => setTimeout(r, 900));
-        i = (i + 1) % writers.length;
-        if (i === 0) {
-          await new Promise((r) => setTimeout(r, 400));
-          writers.forEach((w) => w.hideCharacter({ duration: 300 }));
-          await new Promise((r) => setTimeout(r, 400));
-        }
+        setAnimating(false);
+        await new Promise((r) => setTimeout(r, 1000));
+        writers.forEach((w) => w.hideCharacter({ duration: 300 }));
+        await new Promise((r) => setTimeout(r, 400));
       }
     };
-    animateFrom(0);
+    run();
     return () => {
       cancelled = true;
       stopRef.current = true;
-      writers.forEach((w) => {
-        try {
-          w.cancelQuiz();
-        } catch {
-          /* bỏ qua */
-        }
-      });
+      setAnimating(false);
+      writers.forEach((w) => { try { w.cancelQuiz(); } catch { /* ignore */ } });
     };
-  }, [mode, chars, speed, showOutline, restartKey]);
+  }, [mode, chars, speed, showOutline, theme, restartKey]);
 
-  // Chế độ luyện tập: quiz từng chữ, xong chữ này tự chuyển chữ kế
+  // Practice mode: quiz each character in sequence
   useEffect(() => {
     if (mode !== 'practice') return;
     stopRef.current = true;
@@ -112,7 +116,6 @@ export default function StrokeOrder({ chars }) {
 
     const quizAt = (i) => {
       if (cancelled || i >= writers.length) return;
-      setCurrent(i);
       writers[i].quiz({
         showHintAfterMisses: 2,
         onComplete: () => setTimeout(() => quizAt(i + 1), 600),
@@ -121,15 +124,9 @@ export default function StrokeOrder({ chars }) {
     quizAt(0);
     return () => {
       cancelled = true;
-      writers.forEach((w) => {
-        try {
-          w.cancelQuiz();
-        } catch {
-          /* bỏ qua */
-        }
-      });
+      writers.forEach((w) => { try { w.cancelQuiz(); } catch { /* ignore */ } });
     };
-  }, [mode, chars, restartKey, speed, showOutline]);
+  }, [mode, chars, restartKey, speed, showOutline, theme]);
 
   const restart = () => setRestartKey((k) => k + 1);
 
@@ -149,7 +146,7 @@ export default function StrokeOrder({ chars }) {
 
       <div className="strokes__boxes">
         {chars.map((ch, i) => (
-          <div key={`${ch}-${i}`} className={`stroke-box ${i === current ? 'is-current' : ''}`}>
+          <div key={`${ch}-${i}`} className={`stroke-box ${animating && mode === 'watch' ? 'is-animating' : ''}`}>
             <div className="stroke-box__grid" aria-hidden="true">
               <span className="h" />
               <span className="v" />
@@ -180,7 +177,7 @@ export default function StrokeOrder({ chars }) {
       </div>
       <p className="muted strokes__hint">
         {mode === 'watch'
-          ? 'Animation tự chạy và lặp lại liên tục – không cần bấm.'
+          ? 'Tất cả chữ viết đồng thời, lặp lại liên tục – không cần bấm.'
           : 'Dùng chuột hoặc ngón tay viết từng nét theo đúng thứ tự. Sai 2 lần sẽ hiện gợi ý.'}
       </p>
     </section>

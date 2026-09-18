@@ -1,4 +1,42 @@
+/* ===== LIGHT (default) ===== */
 :root {
+  --bg: #ffffff;
+  --bg-2: #f4f4f5;
+  --bg-3: #e4e4e7;
+  --border: #d4d4d8;
+  --text: #18181b;
+  --text-2: #52525b;
+  --text-3: #a1a1aa;
+  --red: #e11d48;
+  --red-soft: rgba(225, 29, 72, 0.12);
+  --gold: #d97706;
+  --blue: #0ea5e9;
+  --green: #16a34a;
+  --radius: 18px;
+  --font: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-cn: 'Noto Sans SC', 'Noto Serif SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  --font-cn-serif: 'Noto Serif SC', 'Noto Sans SC', 'Microsoft YaHei', serif;
+
+  /* Semantic tokens */
+  --header-bg: rgba(255, 255, 255, 0.92);
+  --hero-start: #dbeafe;
+  --hero-mid: #ede9fe;
+  --hero-grid: rgba(0, 0, 0, 0.05);
+  --chip-bg: rgba(0, 0, 0, 0.04);
+  --chip-border: rgba(0, 0, 0, 0.08);
+  --meaning-bg: rgba(0, 0, 0, 0.04);
+  --meaning-border: rgba(0, 0, 0, 0.07);
+  --ghost-bg: rgba(0, 0, 0, 0.05);
+  --ghost-border: rgba(0, 0, 0, 0.12);
+  --icon-btn-bg: rgba(0, 0, 0, 0.05);
+  --icon-btn-border: rgba(0, 0, 0, 0.12);
+  --stroke-bg: #ffffff;
+  --stroke-grid: #e4e4e7;
+  --suggest-shadow: 0 16px 40px rgba(0, 0, 0, 0.12);
+}
+
+/* ===== DARK override ===== */
+[data-theme="dark"] {
   --bg: #0b0b0d;
   --bg-2: #141417;
   --bg-3: #1c1c21;
@@ -11,10 +49,22 @@
   --gold: #f5c542;
   --blue: #38bdf8;
   --green: #4ade80;
-  --radius: 18px;
-  --font: 'Be Vietnam Pro', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-cn: 'Noto Sans SC', 'Noto Serif SC', 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  --font-cn-serif: 'Noto Serif SC', 'Noto Sans SC', 'Microsoft YaHei', serif;
+
+  --header-bg: rgba(11, 11, 13, 0.85);
+  --hero-start: #2b3a66;
+  --hero-mid: #1b1b2f;
+  --hero-grid: rgba(255, 255, 255, 0.05);
+  --chip-bg: rgba(255, 255, 255, 0.08);
+  --chip-border: rgba(255, 255, 255, 0.08);
+  --meaning-bg: rgba(0, 0, 0, 0.35);
+  --meaning-border: rgba(255, 255, 255, 0.08);
+  --ghost-bg: rgba(255, 255, 255, 0.08);
+  --ghost-border: rgba(255, 255, 255, 0.14);
+  --icon-btn-bg: rgba(255, 255, 255, 0.08);
+  --icon-btn-border: rgba(255, 255, 255, 0.14);
+  --stroke-bg: #131316;
+  --stroke-grid: #2e2e36;
+  --suggest-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
 }
 
 * {
@@ -80,7 +130,7 @@ main.container {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: rgba(11, 11, 13, 0.85);
+  background: var(--header-bg);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid var(--border);
 }
@@ -144,6 +194,23 @@ main.container {
 }
 .lang-btn__sep {
   opacity: 0.5;
+}
+.theme-btn {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg-2);
+  color: var(--text-2);
+  font-size: 1rem;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s;
+}
+.theme-btn:hover {
+  background: var(--bg-3);
+  color: var(--text);
 }
 
 /* ---------- Filters ---------- */
@@ -285,7 +352,7 @@ main.container {
   background: var(--bg-2);
   border: 1px solid var(--border);
   border-radius: 14px;
-  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.5);
+  box-shadow: var(--suggest-shadow);
   max-height: 60vh;
   overflow: auto;
 }
@@ -408,14 +475,14 @@ main.container {
   padding: 22px 24px 20px;
   border-radius: var(--radius);
   border: 1px solid var(--border);
-  background: radial-gradient(120% 140% at 100% 0%, #2b3a66 0%, #1b1b2f 45%, var(--bg-2) 100%);
+  background: radial-gradient(120% 140% at 100% 0%, var(--hero-start) 0%, var(--hero-mid) 45%, var(--bg-2) 100%);
 }
 .hero__grid {
   position: absolute;
   inset: 0;
   pointer-events: none;
-  background-image: linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-image: linear-gradient(var(--hero-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--hero-grid) 1px, transparent 1px);
   background-size: 40px 40px;
   mask-image: radial-gradient(60% 80% at 60% 20%, #000 20%, transparent 100%);
 }
@@ -433,8 +500,8 @@ main.container {
   gap: 6px;
   padding: 4px 10px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--chip-bg);
+  border: 1px solid var(--chip-border);
   font-size: 0.8rem;
   color: var(--text-2);
 }
@@ -471,13 +538,13 @@ main.container {
   width: 46px;
   height: 46px;
   border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.14);
-  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--icon-btn-border);
+  background: var(--icon-btn-bg);
   color: var(--text);
   transition: background 0.15s;
 }
 .icon-btn:hover {
-  background: rgba(255, 255, 255, 0.16);
+  background: var(--bg-3);
 }
 .icon-btn--sm {
   display: inline-grid;
@@ -495,8 +562,8 @@ main.container {
 .meaning {
   padding: 12px 16px;
   border-radius: 14px;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--meaning-bg);
+  border: 1px solid var(--meaning-border);
 }
 .meaning__label {
   font-size: 0.72rem;
@@ -550,21 +617,11 @@ main.container {
   font-weight: 700;
   color: #fff;
 }
-.tone--1 {
-  background: #dc2626;
-}
-.tone--2 {
-  background: #d97706;
-}
-.tone--3 {
-  background: #16a34a;
-}
-.tone--4 {
-  background: #2563eb;
-}
-.tone--5 {
-  background: #52525b;
-}
+.tone--1 { background: #dc2626; }
+.tone--2 { background: #d97706; }
+.tone--3 { background: #16a34a; }
+.tone--4 { background: #2563eb; }
+.tone--5 { background: #52525b; }
 
 .btn {
   padding: 9px 16px;
@@ -579,8 +636,8 @@ main.container {
   border-color: var(--text-3);
 }
 .btn--ghost {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.14);
+  background: var(--ghost-bg);
+  border-color: var(--ghost-border);
 }
 
 /* ---------- Panels ---------- */
@@ -657,11 +714,11 @@ main.container {
   width: 220px;
   height: 220px;
   border-radius: 16px;
-  background: #131316;
+  background: var(--stroke-bg);
   border: 2px solid var(--border);
   transition: border-color 0.2s, box-shadow 0.2s;
 }
-.stroke-box.is-current {
+.stroke-box.is-animating {
   border-color: var(--red);
   box-shadow: 0 0 0 4px var(--red-soft);
 }
@@ -672,7 +729,7 @@ main.container {
 }
 .stroke-box__grid span {
   position: absolute;
-  background: #2e2e36;
+  background: var(--stroke-grid);
 }
 .stroke-box__grid .h {
   left: 6%;
