@@ -33,6 +33,17 @@ export default function WordHero({ word, strokeCount }) {
         <span className="chip">📖 {t.chineseVocab}</span>
         <span className="chip chip--gold">{lang === 'vi' ? word.pos : word.posEn}</span>
         <span className={`chip chip--level lvl--${word.level}`}>HSK {word.level}</span>
+        <button
+          className="icon-btn stroke-jump-btn"
+          onClick={() => document.getElementById('strokes')?.scrollIntoView({ behavior: 'smooth' })}
+          title={lang === 'vi' ? 'Xem cách viết chữ' : 'Stroke order'}
+          aria-label={lang === 'vi' ? 'Xem cách viết chữ' : 'Stroke order'}
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 20h9" />
+            <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z" />
+          </svg>
+        </button>
       </div>
 
       <div className="hero__pinyin">{word.pinyinSpaced || word.pinyin}</div>
@@ -83,17 +94,9 @@ export default function WordHero({ word, strokeCount }) {
             ))}
           </span>
         </div>
-        <div className="hero__actions">
-          <button
-            className="btn btn--stroke-jump"
-            onClick={() => document.getElementById('strokes')?.scrollIntoView({ behavior: 'smooth' })}
-          >
-            ✍ {lang === 'vi' ? 'Cách viết' : 'Stroke order'}
-          </button>
-          <button className="btn btn--ghost" onClick={share}>
-            {copied ? `✓ ${t.copied}` : `⤴ ${t.share}`}
-          </button>
-        </div>
+        <button className="btn btn--ghost" onClick={share}>
+          {copied ? `✓ ${t.copied}` : `⤴ ${t.share}`}
+        </button>
       </div>
     </section>
   );
